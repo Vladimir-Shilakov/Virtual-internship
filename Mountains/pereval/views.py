@@ -1,5 +1,7 @@
+from rest_framework.response import Response
+
 from .serializers import *
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -25,3 +27,29 @@ class ImagesViewSet(viewsets.ModelViewSet):
 class MountainViewSet(viewsets.ModelViewSet):
     queryset = Mountain.objects.all()
     serializer_class = MountainSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = MountainSerializer(data=request.data)
+        if status.HTTP_500_INTERNAL_SERVER_ERROR:
+            return Response(
+                {
+                    'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    'message': serializer.errors
+                }
+            )
+        if status.HTTP_400_BAD_REQUEST:
+            return Response(
+                {
+                    'status': status.HTTP_400_BAD_REQUEST,
+                    'message': serializer.errors
+                }
+            )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    'status': status.HTTP_200_OK,
+                    'message': 'Отправлено успешно',
+                    'id': serializer.data[id]
+                }
+            )
