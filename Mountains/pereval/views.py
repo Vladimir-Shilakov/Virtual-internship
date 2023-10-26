@@ -34,14 +34,14 @@ class MountainViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                     'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    'message': serializer.errors
+                    'message': 'SERVER ERROR'
                 }
             )
         if status.HTTP_400_BAD_REQUEST:
             return Response(
                 {
                     'status': status.HTTP_400_BAD_REQUEST,
-                    'message': serializer.errors
+                    'message': 'BAD REQUEST'
                 }
             )
         if serializer.is_valid():
@@ -53,3 +53,9 @@ class MountainViewSet(viewsets.ModelViewSet):
                     'id': serializer.data[id]
                 }
             )
+        # else:
+        #     return Response(
+        #         {
+        #             'message': serializer.errors
+        #         }
+        #     )
