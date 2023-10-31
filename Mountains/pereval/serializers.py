@@ -59,3 +59,23 @@ class MountainSerializer(serializers.ModelSerializer):
         mountain = Mountain.ojbects.create(user, coords, level, images, status='new', **validated_data)
         mountain.save()
         return mountain
+
+    def validate(self, data):
+        if self.instance is not None:
+            instance_user = self.instance.user
+            data_user = data.get('user')
+            user_fields_for_validation = [
+                instance_user.name != data_user['name'],
+                instance_user.otc != data_user['otc'],
+                instance_user.fam != data_user['fam'],
+                instance_user.email != data_user['email'],
+                instance_user.phone != data_user['phone'],
+            ]
+            if data_user is not None and any(user_fields_for_validation):
+                raise serializers.ValidationError(
+                    {
+                        'message': 'Данные пользователя нельзя изменить',
+                    }
+                )
+        return data
+
