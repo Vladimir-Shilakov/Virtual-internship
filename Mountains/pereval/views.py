@@ -33,20 +33,6 @@ class MountainViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         serializer = MountainSerializer(data=request.data)
-        if status.HTTP_500_INTERNAL_SERVER_ERROR:
-            return Response(
-                {
-                    'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    'message': 'SERVER ERROR'
-                }
-            )
-        if status.HTTP_400_BAD_REQUEST:
-            return Response(
-                {
-                    'status': status.HTTP_400_BAD_REQUEST,
-                    'message': 'BAD REQUEST'
-                }
-            )
         if serializer.is_valid():
             serializer.save()
             return Response(
@@ -54,6 +40,20 @@ class MountainViewSet(viewsets.ModelViewSet):
                     'status': status.HTTP_200_OK,
                     'message': 'Отправлено успешно',
                     'id': serializer.data[id]
+                }
+            )
+        if status.HTTP_500_INTERNAL_SERVER_ERROR:
+            return Response(
+                {
+                    'status': status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    'message': serializer.errors
+                }
+            )
+        if status.HTTP_400_BAD_REQUEST:
+            return Response(
+                {
+                    'status': status.HTTP_400_BAD_REQUEST,
+                    'message': 'BAD REQUEST'
                 }
             )
 

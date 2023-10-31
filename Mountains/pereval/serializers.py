@@ -1,5 +1,6 @@
 from .models import *
 from rest_framework import serializers
+from drf_writable_nested import WritableNestedModelSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -28,7 +29,7 @@ class ImagesSerializer(serializers.ModelSerializer):
         fields = ['data', 'title']
 
 
-class MountainSerializer(serializers.ModelSerializer):
+class MountainSerializer(WritableNestedModelSerializer):
     user = UserSerializer()
     coords = CoordsSerializer()
     level = LevelSerializer(allow_null=True)
@@ -50,11 +51,11 @@ class MountainSerializer(serializers.ModelSerializer):
             user_serializer.is_valid(raise_exception=True)
             user = user_serializer.save()
         else:
-            user = User.objects.create(**user, **validated_data)
+            user = User.objects.create(**user)
 
-        coords = Coords.ojbects.create(**coords, **validated_data)
-        level = Level.objects.create(**level, **validated_data)
-        images = Images.objects.create(**images, **validated_data)
+        coords = Coords.ojbects.create(**coords)
+        level = Level.objects.create(**level)
+        images = Images.objects.create(**images)
 
         mountain = Mountain.ojbects.create(user, coords, level, images, status='new', **validated_data)
         mountain.save()
