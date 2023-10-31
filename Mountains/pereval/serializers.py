@@ -1,5 +1,6 @@
 from .models import *
 from rest_framework import serializers
+from drf_writable_nested import WritableNestedModelSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -28,7 +29,7 @@ class ImagesSerializer(serializers.ModelSerializer):
         fields = ['data', 'title']
 
 
-class MountainSerializer(serializers.ModelSerializer):
+class MountainSerializer(WritableNestedModelSerializer):
     user = UserSerializer()
     coords = CoordsSerializer()
     level = LevelSerializer(allow_null=True)
@@ -50,12 +51,32 @@ class MountainSerializer(serializers.ModelSerializer):
             user_serializer.is_valid(raise_exception=True)
             user = user_serializer.save()
         else:
-            user = User.objects.create(**user, **validated_data)
+            user = User.objects.create(**user)
 
-        coords = Coords.ojbects.create(**coords, **validated_data)
-        level = Level.objects.create(**level, **validated_data)
-        images = Images.objects.create(**images, **validated_data)
+        coords = Coords.ojbects.create(**coords)
+        level = Level.objects.create(**level)
+        images = Images.objects.create(**images)
 
         mountain = Mountain.ojbects.create(user, coords, level, images, status='new', **validated_data)
         mountain.save()
         return mountain
+
+    def validate(self, data):
+        if self.instance is not None:
+            instance_user = self.instance.user
+            data_user = data.get('user')
+            user_fields_for_validation = [
+                instance_user.name != data_user['name'],
+                instance_user.otc != data_user['otc'],
+                instance_user.fam != data_user['fam'],
+                instance_user.email != data_user['email'],
+                instance_user.phone != data_user['phone'],
+            ]
+            if data_user is not None and any(user_fields_for_validation):
+                raise serializers.ValidationError(
+                    {
+                        'message': 'Данные пользователя нельзя изменить',
+                    }
+                )
+        return data
+
