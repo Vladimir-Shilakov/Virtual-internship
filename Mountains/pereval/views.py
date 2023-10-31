@@ -53,9 +53,30 @@ class MountainViewSet(viewsets.ModelViewSet):
                     'id': serializer.data[id]
                 }
             )
-        # else:
-        #     return Response(
-        #         {
-        #             'message': serializer.errors
-        #         }
-        #     )
+
+    def partial_update(self, request, *args, **kwargs):
+        mount_update = self.get_object()
+        if mount_update.status == 'new':
+            serializer = MountainSerializer(mount_update, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
+                    {
+                        'state': 1,
+                        'message': 'Изменения сохраненны'
+                    }
+                )
+            else:
+                return Response(
+                    {
+                        'state': 0,
+                        'message': serializer.errors
+                    }
+                )
+        else:
+            return Response(
+                {
+                    'state': 0,
+                    'message': f'Пост находится в статусе:{mount_update.get_status_display()}, Изменения невозможны'
+                }
+            )
