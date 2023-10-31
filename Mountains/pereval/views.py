@@ -1,3 +1,4 @@
+import django_filters
 from rest_framework.response import Response
 
 from .serializers import *
@@ -27,6 +28,8 @@ class ImagesViewSet(viewsets.ModelViewSet):
 class MountainViewSet(viewsets.ModelViewSet):
     queryset = Mountain.objects.all()
     serializer_class = MountainSerializer
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ["user__email"]
 
     def create(self, request, *args, **kwargs):
         serializer = MountainSerializer(data=request.data)
