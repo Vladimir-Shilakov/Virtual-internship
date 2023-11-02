@@ -69,6 +69,7 @@ class Mountain(models.Model):
     other_titles = models.CharField(max_length=255, verbose_name='Альтернативное название')
     connect = models.TextField(verbose_name='Соединяет')
     add_time = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS, default='new')
 
     def __str__(self):
         return f'{self.pk} {self.beautyTitle}'
