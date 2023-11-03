@@ -67,7 +67,7 @@ class Mountain(models.Model):
     beautyTitle = models.CharField(max_length=255, verbose_name='Титульное название')
     title = models.CharField(max_length=255, verbose_name='Название')
     other_titles = models.CharField(max_length=255, verbose_name='Альтернативное название')
-    connect = models.TextField(verbose_name='Соединяет')
+    connect = models.TextField(verbose_name='Соединяет', null=True)
     add_time = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS, default='new')
 
@@ -80,10 +80,10 @@ class Mountain(models.Model):
 
 
 class Images(models.Model):
-    mountain = models.ForeignKey(Mountain, on_delete=models.CASCADE, related_name='images')
+    data = models.ImageField(upload_to='images/', null=True)
+    title = models.CharField(max_length=255, verbose_name='Название', null=True)
 
-    data = models.ImageField(upload_to='images/')
-    title = models.CharField(max_length=255, verbose_name='Название')
+    mountain = models.ForeignKey(Mountain, on_delete=models.CASCADE, related_name='images')
 
     def __str__(self):
         return f'{self.pk} {self.title}'
